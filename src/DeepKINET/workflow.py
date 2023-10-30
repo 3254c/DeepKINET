@@ -63,5 +63,4 @@ def estimate_kinetics(adata, color, epoch = 2000, learned_checkpoint = None, los
 
 
     results_dict = utils.post_process(adata, vicdyf_exp)
-    model_params_copy = copy.deepcopy(model_params)
     return(adata, vicdyf_exp)
