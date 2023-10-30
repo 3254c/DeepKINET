@@ -1,6 +1,6 @@
 import torch
-from modules import VicDyf
-from dataset import VicDyfDataSet, VicDyfDataManager
+from modules import DeepKINET
+from dataset import DeepKINETDataManager
 import numpy as np
 from statistics import mean
 
@@ -30,11 +30,11 @@ class EarlyStopping:
         torch.save(model.state_dict(), self.path)  #ベストモデルを指定したpathに保存
         self.val_loss_min = val_loss  #その時のlossを記録する
 
-class VicDyfExperiment:
+class DeepKINETExperiment:
     def __init__(self, model_params, lr, s, u,  test_ratio, batch_size, num_workers, checkpoint, validation_ratio):
-        self.edm = VicDyfDataManager(s, u, test_ratio, batch_size, num_workers, validation_ratio)
+        self.edm = DeepKINETDataManager(s, u, test_ratio, batch_size, num_workers, validation_ratio)
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model = VicDyf(**model_params)
+        self.model = DeepKINET(**model_params)
         self.model_params = model_params
         self.model.to(self.device)
         self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=lr)

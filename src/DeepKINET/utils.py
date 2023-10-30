@@ -4,7 +4,7 @@ import scvelo as scv
 import seaborn as sns
 from matplotlib import pyplot as plt
 import torch
-import src_vicdyf
+import exp
 import scanpy as sc
 import umap
 import anndata as ad
@@ -36,7 +36,7 @@ def define_exp(adata, model_params, lr, val_ratio, test_ratio,batch_size, num_wo
     s = s.float()
     u = u.float()
 
-    vicdyf_exp = VicDyfExperiment(model_params, lr, s, u, test_ratio, batch_size, num_workers, checkpoint, val_ratio)
+    vicdyf_exp = exp.DeepKINETExperiment(model_params, lr, s, u, test_ratio, batch_size, num_workers, checkpoint, val_ratio)
     return(vicdyf_exp)
 
 def post_process(adata, vicdyf_exp):

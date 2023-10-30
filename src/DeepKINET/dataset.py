@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 
-class VicDyfDataSet(torch.utils.data.Dataset):
+class DeepKINETDataSet(torch.utils.data.Dataset):
     def __init__(self, s, u, norm_mat, norm_mat_u):
         self.s = s
         self.u = u
@@ -17,7 +17,7 @@ class VicDyfDataSet(torch.utils.data.Dataset):
         return(idx_s, idx_u, idx_norm_mat, idx_norm_mat_u)
 
 
-class VicDyfDataManager():
+class DeepKINETDataManager():
     def __init__(self, s, u, test_ratio, batch_size, num_workers, validation_ratio):
         snorm_mat = torch.mean(s, dim=1, keepdim=True) * torch.mean(s, dim=0, keepdim=True)
         snorm_mat =  torch.mean(s) * snorm_mat / torch.mean(snorm_mat)
@@ -42,6 +42,6 @@ class VicDyfDataManager():
         self.test_u = u[test_idx]
         self.test_norm_mat = self.norm_mat[test_idx]
         self.test_norm_mat_u = self.norm_mat_u[test_idx]
-        self.train_eds = VicDyfDataSet(self.s[train_idx], self.u[train_idx], self.norm_mat[train_idx], self.norm_mat_u[train_idx])
+        self.train_eds = DeepKINETDataSet(self.s[train_idx], self.u[train_idx], self.norm_mat[train_idx], self.norm_mat_u[train_idx])
         self.train_loader = torch.utils.data.DataLoader(
             self.train_eds, batch_size=batch_size, shuffle=True, num_workers=num_workers, drop_last=True, pin_memory=True)

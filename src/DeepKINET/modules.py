@@ -82,9 +82,9 @@ class Decoder(nn.Module):
         normalize_ld = correct_ld  / correct_ld.mean(dim=-1, keepdim=True)
         return(normalize_ld)
 
-class VicDyf(nn.Module):
+class DeepKINET(nn.Module):
     def __init__(self, x_dim, loss_mode, z_dim = 20, h_dim = 100, enc_z_layers = 2):
-        super(VicDyf, self).__init__()
+        super(DeepKINET, self).__init__()
         self.enc_z = Encoder_of_s_u(enc_z_layers, x_dim, h_dim, z_dim)
         self.enc_d = Encoder(z_dim, h_dim, z_dim)
         self.dec_z = Decoder(z_dim, h_dim, x_dim)
