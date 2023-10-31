@@ -10,3 +10,5 @@ formats:
   - pdf
   - epub
 type: sphinx
+build:
+  image: latest
