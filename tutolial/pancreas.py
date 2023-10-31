@@ -2,6 +2,7 @@ import scvelo as scv
 import sys
 sys.path.append('src/DeepKINET')
 import workflow
+import utils
 import scanpy as sc
 from matplotlib import pyplot as plt
 
@@ -15,6 +16,8 @@ color = 'clusters'
 adata, vicdyf_exp = workflow.estimate_kinetics(adata, color = color)
 
 print(adata)
+
+utils.embedding_func(adata, color, save_path = '.deepkinet_velocity.png', embeddings = 'X_umap', n_neighbors = 30)
 
 gene_a = 'Actn4'
 gene_b = 'Cpe'

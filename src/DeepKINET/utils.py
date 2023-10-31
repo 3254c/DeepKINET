@@ -206,7 +206,7 @@ def plt_beta_gamma(adata):
         sns.violinplot(y=name,orient='v',ax=ax).set_title('gene={}'.format(adata.var_names[i]))
 
 
-def embedding_func(adata, color, vicdyf_exp, embeddings = 'X_umap', n_neighbors = 30):
+def embedding_func(adata, color, save_path = '.deepkinet_velocity.png', embeddings = 'X_umap', n_neighbors = 30):
 
     adata_z = ad.AnnData(adata.obsm['X_vicdyf_zl'])
     adata_z.obs_names = adata.obs_names
@@ -222,7 +222,7 @@ def embedding_func(adata, color, vicdyf_exp, embeddings = 'X_umap', n_neighbors 
     #dの図示
     sc.pp.neighbors(adata_z, n_neighbors = n_neighbors, use_rep='X_vicdyf_zl')
     scv.tl.velocity_graph(adata_z,vkey='X_vicdyf_dl',xkey='X_vicdyf_zl')
-    scv.pl.velocity_embedding_grid(adata_z, basis='X_original_umap',X=adata_z.obsm['X_original_umap'],vkey='X_vicdyf_dl', width=0.002, arrow_length=1,headwidth=10, density=0.4, arrow_color='black', color=color)
+    scv.pl.velocity_embedding_grid(adata_z, basis='X_original_umap',X=adata_z.obsm['X_original_umap'],vkey='X_vicdyf_dl', width=0.002, arrow_length=1,headwidth=10, density=0.4, arrow_color='black', color=color, save = save_path)
 
     # #ds/dt
     # sc.pp.neighbors(adata, n_neighbors = n_neighbors, use_rep='X_vicdyf_zl')
@@ -231,26 +231,3 @@ def embedding_func(adata, color, vicdyf_exp, embeddings = 'X_umap', n_neighbors 
 
     #sc.pl.umap(adata, color='total_counts',neighbors_key='X_vicdyf_zl')
     sc.pl.umap(adata,color='vicdyf_fluctuation')
-
-    fig_cell_0, ax_cell_0 = plt.subplots()
-    fig_cell_1, ax_cell_1 = plt.subplots()
-    fig_cell_2, ax_cell_2 = plt.subplots()
-
-    if color != None:
-        value = adata.obs[f'{color}']
-    else:
-        value = adata.obs['leiden']
-        color = 'leiden'
-    value_unique = value.unique()
-    for i in range(len(value_unique)):
-        x = adata.layers['lambda'][adata.obs[f'{color}'] == value_unique[i],0]
-        y = adata.layers['pu_zd_ld'][adata.obs[f'{color}'] == value_unique[i],0]
-        ax_cell_0.scatter(x, y)
-    for i in range(len(value_unique)):
-        x = adata.layers['lambda'][adata.obs[f'{color}'] == value_unique[i],1]
-        y = adata.layers['pu_zd_ld'][adata.obs[f'{color}'] == value_unique[i],1]
-        ax_cell_1.scatter(x, y)
-    for i in range(len(value_unique)):
-        x = adata.layers['lambda'][adata.obs[f'{color}'] == value_unique[i],2]
-        y = adata.layers['pu_zd_ld'][adata.obs[f'{color}'] == value_unique[i],2]
-        ax_cell_2.scatter(x, y)
