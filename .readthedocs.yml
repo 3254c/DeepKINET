@@ -5,6 +5,8 @@ python:
     - requirements: docs/requirements.txt
 sphinx:
   configuration: docs/conf.py
-formats: 
-  - html
+formats:
+  - htmlzip
+  - pdf
+  - epub
 type: sphinx
