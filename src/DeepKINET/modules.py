@@ -2,7 +2,6 @@ import torch
 import torch.distributions as dist
 import torch.nn as nn
 from torch.nn.parameter import Parameter
-from torch.distributions.kl import kl_divergence
 from torch.nn import init
 import functorch
 from einops import rearrange, reduce, repeat
@@ -97,7 +96,7 @@ class DeepKINET(nn.Module):
         self.logtheta = Parameter(torch.Tensor(x_dim))
         self.softplus = nn.Softplus()
         self.dynamics = False
-        self.kinetics_rates = False
+        self.kinetics = False
         self.relu = nn.ReLU()
         self.loss_mode = loss_mode
         print('loss_mode',self.loss_mode)
@@ -150,7 +149,7 @@ class DeepKINET(nn.Module):
         raw_u_ld = (diff_px_zd_ld + s_hat * gamma) / beta
         pu_zd_ld = raw_u_ld + self.relu(- raw_u_ld).detach()
 
-        if self.kinetics_rates:
+        if self.kinetics:
             each_beta = self.dec_b(z) * self.dt
             each_gamma = self.dec_g(z) * self.dt
             raw_u_ld = (diff_px_zd_ld + s_hat * each_gamma) / each_beta

@@ -1,6 +1,5 @@
 import torch
 import utils
-import copy
 import numpy as np
 
 def estimate_kinetics(adata, color, epoch = 2000, learned_checkpoint = None, loss_mode = 'poisson', checkpoint='.deepkinet_opt.pt', lr = 0.001):
@@ -22,7 +21,7 @@ def estimate_kinetics(adata, color, epoch = 2000, learned_checkpoint = None, los
         print('Start Dynamics opt')
         print('Dynamics opt patience',patience)
         vicdyf_exp.model.dynamics = True
-        vicdyf_exp.model.kinetics_rates = False
+        vicdyf_exp.model.kinetics = False
         vicdyf_exp.init_optimizer(lr)
         vicdyf_exp.train_total(epoch, patience)
         vicdyf_exp.model.load_state_dict(torch.load(checkpoint))
@@ -38,7 +37,7 @@ def estimate_kinetics(adata, color, epoch = 2000, learned_checkpoint = None, los
         print('Start Kinetics opt')
         print('Kinetics opt patience',patience)
         vicdyf_exp.model.dynamics = False
-        vicdyf_exp.model.kinetics_rates = True
+        vicdyf_exp.model.kinetics = True
         for param in vicdyf_exp.model.parameters():
             param.requires_grad = False
         for param in vicdyf_exp.model.dec_b.parameters():

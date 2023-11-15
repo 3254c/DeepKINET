@@ -39,3 +39,4 @@ axes[1,2].set_title(f'{gene_b} degradation rates')
 plt.savefig(f"pancreas_{gene_a}_{gene_b}.png")
 plt.show()
 
+#
