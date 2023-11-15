@@ -184,4 +184,4 @@ def embedding_func(adata, color, save_path = '.deepkinet_velocity.png', embeddin
     sc.pp.neighbors(adata_z, n_neighbors = n_neighbors, use_rep='latent_variable')
     scv.tl.velocity_graph(adata_z,vkey='latent_velocity',xkey='latent_variable')
     scv.pl.velocity_embedding_grid(adata_z, basis='X_original_umap',X=adata_z.obsm['X_original_umap'],vkey='latent_velocity', width=0.002, arrow_length=1,headwidth=10, density=0.4, arrow_color='black', color=color, save = save_path)
-    adata.uns['velocity_graph'] = adata_z.uns['velocity_graph']
+    #adata.uns['velocity_graph'] = adata_z.uns['velocity_graph']
