@@ -52,11 +52,10 @@ def post_process(adata, vicdyf_exp):
     vicdyf_exp.device = torch.device('cpu')
     vicdyf_exp.model = vicdyf_exp.model.to(vicdyf_exp.device)
 
-    z, dz, qz, qdz, s_hat, diff_px_zd_ld, pu_zd_ld  = vicdyf_exp.model(s, u)
+    z, d, qz, qd, s_hat, diff_px_zd_ld, pu_zd_ld  = vicdyf_exp.model(s, u)
     zl = qz.loc
-    dz, qdz = vicdyf_exp.model.enc_d(zl)
+    d, qd = vicdyf_exp.model.enc_d(zl)
     px_z_ld = vicdyf_exp.model.dec_z(zl)
-    adata.layers['lambda'] = px_z_ld.cpu().detach().numpy()
     norm_mat=vicdyf_exp.edm.norm_mat
     norm_mat_np = norm_mat.cpu().detach().numpy()
     norm_mat_u=vicdyf_exp.edm.norm_mat_u
@@ -64,22 +63,19 @@ def post_process(adata, vicdyf_exp):
 
     adata.layers['norm_mat'] = norm_mat_np
     adata.layers['norm_mat_u'] = norm_mat_u_np
-    t_sum_per_cells = (s+u).sum(axis=1)
-    adata.obs['total_counts']=t_sum_per_cells
 
     each_beta = vicdyf_exp.model.dec_b(zl) * vicdyf_exp.model.dt
     each_gamma = vicdyf_exp.model.dec_g(zl) * vicdyf_exp.model.dt
     adata.layers['splicing_rate'] = each_beta.cpu().detach().numpy()
     adata.layers['degradation_rate'] = each_gamma.cpu().detach().numpy()
 
-    dzl = qdz.loc
-
+    dl = qd.loc
     adata.obsm['latent_variable'] = zl.cpu().detach().numpy()
     adata.obsm['latent_variable_sample'] = z.cpu().detach().numpy()
-    adata.obsm['latent_velocity'] = dzl.cpu().detach().numpy()
-    adata.obsm['latent_velocity_sample'] = dz.cpu().detach().numpy()
+    adata.obsm['latent_velocity'] = dl.cpu().detach().numpy()
+    adata.obsm['latent_velocity_sample'] = d.cpu().detach().numpy()
 
-    diff_px_zd_ld = vicdyf_exp.model.calculate_diff_x_grad(zl, dzl)
+    diff_px_zd_ld = vicdyf_exp.model.calculate_diff_x_grad(zl, dl)
 
     raw_u_ld = (diff_px_zd_ld + s_hat * each_gamma) / each_beta
     pu_zd_ld = raw_u_ld + vicdyf_exp.model.relu(- raw_u_ld).detach()
@@ -88,10 +84,8 @@ def post_process(adata, vicdyf_exp):
     px_z_ld_df = pd.DataFrame(px_z_ld.cpu().detach().numpy(),columns=list(adata.var_names))
     pu_zd_ld_df = pd.DataFrame(pu_zd_ld.cpu().detach().numpy(),columns=list(adata.var_names))
     adata.layers['u_hat'] = pu_zd_ld_df
-    adata.layers['s_hat_normmat'] = (px_z_ld * norm_mat).cpu().detach().numpy()
-    adata.layers['s_hat'] = px_z_ld_df
+    adata.layers['s_hat'] = px_z_ld.cpu().detach().numpy()
     adata.obsm['s_hat'] = px_z_ld.cpu().detach().numpy()
-    adata.obsm['s_hat_normmat'] = (px_z_ld * norm_mat).cpu().detach().numpy()
     s_df = pd.DataFrame(s.cpu().detach().numpy(), columns=list(adata.var_names))
     u_df = pd.DataFrame(u.cpu().detach().numpy(), columns=list(adata.var_names))
 
@@ -114,7 +108,7 @@ def post_process(adata, vicdyf_exp):
     print('test_s_correlation', test_s_correlation)
     print('test_u_correlation', test_u_correlation)
 
-    adata.layers['DeepKINET_velocity'] = vicdyf_exp.model.calculate_diff_x_grad(zl, dzl).cpu().detach().numpy()
+    adata.layers['DeepKINET_velocity'] = vicdyf_exp.model.calculate_diff_x_grad(zl, dl).cpu().detach().numpy()
     adata.obs['DeepKINET_velocity'] = np.mean(np.abs(adata.layers['DeepKINET_velocity']), axis=1)
 
     results_dict = {

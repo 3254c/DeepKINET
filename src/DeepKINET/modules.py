@@ -141,9 +141,9 @@ class DeepKINET(nn.Module):
 
     def forward(self, s, u):
         z, qz = self.enc_z(s, u)
-        dz, qd = self.enc_d(z)
+        d, qd = self.enc_d(z)
         s_hat = self.dec_z(z)
-        diff_px_zd_ld = self.calculate_diff_x_grad(z, dz)
+        diff_px_zd_ld = self.calculate_diff_x_grad(z, d)
         beta = self.softplus(self.logbeta) * self.dt
         gamma = self.softplus(self.loggamma) * self.dt
         raw_u_ld = (diff_px_zd_ld + s_hat * gamma) / beta
@@ -155,10 +155,10 @@ class DeepKINET(nn.Module):
             raw_u_ld = (diff_px_zd_ld + s_hat * each_gamma) / each_beta
             pu_zd_ld = raw_u_ld + self.relu(- raw_u_ld).detach()
 
-        return(z, dz, qz, qd, s_hat, diff_px_zd_ld, pu_zd_ld)
+        return(z, d, qz, qd, s_hat, diff_px_zd_ld, pu_zd_ld)
 
     def elbo_loss(self, s, u, norm_mat, norm_mat_u):
-        z, dz, qz, qd, s_hat, diff_px_zd_ld, pu_zd_ld =  self(s, u)
+        z, d, qz, qd, s_hat, diff_px_zd_ld, pu_zd_ld =  self(s, u)
 
         if self.loss_mode == 'poisson':
             loss_func = lambda ld: self.calc_poisson_loss(ld, norm_mat, s)
