@@ -99,8 +99,8 @@ def post_process(adata, vicdyf_exp):
     test_s_correlation = ((px_z_ld_df).T[test_idx].T).corrwith((s_df / norm_mat_np).T[test_idx].T).mean()
     test_u_correlation = ((pu_zd_ld_df).T[test_idx].T).corrwith((u_df / norm_mat_u_np).T[test_idx].T).mean()
 
-    print('s_correlation', train_s_correlation)
-    print('u_correlation', train_u_correlation)
+    print('train_s_correlation', train_s_correlation)
+    print('train_u_correlation', train_u_correlation)
 
     print('val_s_correlation', val_s_correlation)
     print('val_u_correlation', val_u_correlation)
@@ -112,9 +112,9 @@ def post_process(adata, vicdyf_exp):
     adata.obs['DeepKINET_velocity'] = np.mean(np.abs(adata.layers['DeepKINET_velocity']), axis=1)
 
     results_dict = {
-        's_correlation':adata.uns['s_correlation'], 'u_correlation':adata.uns['u_correlation'],
-        'val_s_correlation':adata.uns['val_s_correlation'], 'val_u_correlation':adata.uns['val_u_correlation'],
-        'test_s_correlation':adata.uns['test_s_correlation'], 'test_u_correlation':adata.uns['test_u_correlation'],
+        'train_s_correlation':train_s_correlation, 'train_u_correlation':train_u_correlation,
+        'val_s_correlation':val_s_correlation, 'val_u_correlation':val_u_correlation,
+        'test_s_correlation':test_s_correlation, 'test_u_correlation':test_u_correlation,
         'Dynamics_last_val_loss':adata.uns['Dynamics_last_val_loss'].item(),
         'Dynamics_last_test_loss':adata.uns['Dynamics_last_test_loss'].item(),
         'Kinetics_last_val_loss':adata.uns['Kinetics_last_val_loss'].item(),
