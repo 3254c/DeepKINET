@@ -197,3 +197,57 @@ def latent_velocity_pseudotime(adata):
     scv.tl.velocity_graph(adata_z,vkey='latent_velocity',xkey='latent_variable')
     scv.tl.velocity_pseudotime(adata_z, vkey='latent_velocity')
     adata.obs['latent_velocity_pseudotime'] = adata_z.obs['latent_velocity_pseudotime']
+
+def kinetic_rate_cluster_separate(adata):
+  #cluster解析
+  sc.pp.neighbors(adata, n_neighbors=30, use_rep='latent_variable')
+
+  splicing_rate_z_np = (adata.layers['splicing_rate'] - adata.layers['splicing_rate'].mean(axis = 0)) / adata.layers['splicing_rate'].std(axis = 0)
+  degradation_rate_z_np = (adata.layers['degradation_rate'] - adata.layers['degradation_rate'].mean(axis = 0)) /adata.layers['degradation_rate'].std(axis = 0)
+
+  adata_splicing_rate_T = ad.AnnData(splicing_rate_z_np.T)
+  adata_splicing_rate_T.obs_names = adata.var_names
+  sc.pp.pca(adata_splicing_rate_T)
+  sc.pp.neighbors(adata_splicing_rate_T)
+  sc.tl.leiden(adata_splicing_rate_T, key_added = 'splicing_rate_leiden')
+  #sc.tl.umap(adata_splicing_rate_T)
+  #sc.pl.umap(adata_splicing_rate_T, color = 'splicing_rate_leiden')
+  adata.var['splicing_rate_leiden'] = adata_splicing_rate_T.obs['splicing_rate_leiden']
+
+  adata_degradation_rate_T = ad.AnnData(degradation_rate_z_np.T)
+  adata_degradation_rate_T.obs_names = adata.var_names
+  sc.pp.pca(adata_degradation_rate_T)
+  sc.pp.neighbors(adata_degradation_rate_T)
+  sc.tl.leiden(adata_degradation_rate_T, key_added = 'degradation_rate_leiden')
+  #sc.tl.umap(adata_degradation_rate_T)
+  #sc.pl.umap(adata_degradation_rate_T, color = 'degradation_rate_leiden')
+  adata.var['degradation_rate_leiden'] = adata_degradation_rate_T.obs['degradation_rate_leiden']
+
+def kinetic_rate_cluster_both(adata):
+  #cluster解析
+  sc.pp.neighbors(adata, n_neighbors=30, use_rep='latent_variable')
+
+  splicing_rate_z_np = (adata.layers['splicing_rate'] - adata.layers['splicing_rate'].mean(axis = 0)) / adata.layers['splicing_rate'].std(axis = 0)
+  degradation_rate_z_np = (adata.layers['degradation_rate'] - adata.layers['degradation_rate'].mean(axis = 0)) /adata.layers['degradation_rate'].std(axis = 0)
+
+  kinetic_rate_np_T = np.concatenate([splicing_rate_z_np.T, degradation_rate_z_np.T], axis =1)
+  adata_kinetic_rate_T = ad.AnnData(kinetic_rate_np_T)
+  adata_kinetic_rate_T.obs_names = adata.var_names
+  sc.pp.pca(adata_kinetic_rate_T)
+  sc.pp.neighbors(adata_kinetic_rate_T)
+  sc.tl.leiden(adata_kinetic_rate_T, key_added = 'kinetic_rate_leiden')
+  #sc.tl.umap(adata_kinetic_rate_T)
+  #sc.pl.umap(adata_kinetic_rate_T, color = 'kinetic_rate_leiden')
+  adata.var['kinetic_rate_leiden'] = adata_kinetic_rate_T.obs['kinetic_rate_leiden']
+
+def rank_genes_groups_splicing(adata, groupby, groups, reference, method = 't-test', n_genes=20):
+  sc.tl.rank_genes_groups(adata, groupby = groupby, layer = 'splicing_rate', groups=groups, reference=reference, method=method, key_added = 'rank_genes_groups_splicing')
+  sc.pl.rank_genes_groups(adata, groups = groups, n_genes=n_genes, show = False, key = 'rank_genes_groups_splicing')
+  rank_genes_splicing = list(adata.uns['rank_genes_groups_splicing']['names']['Beta'])
+  return rank_genes_splicing
+
+def rank_genes_groups_degradation(adata, groupby, groups, reference, method = 't-test', n_genes=20):
+  sc.tl.rank_genes_groups(adata, groupby = groupby, layer = 'degradation_rate', groups=groups, reference=reference, method=method, key_added = 'rank_genes_groups_degradation')
+  sc.pl.rank_genes_groups(adata, groups = groups, n_genes=n_genes, show = False, key = 'rank_genes_groups_degradation')
+  rank_genes_degradation = list(adata.uns['rank_genes_groups_degradation']['names']['Beta'])
+  return rank_genes_degradation
