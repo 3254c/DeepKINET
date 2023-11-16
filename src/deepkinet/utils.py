@@ -240,3 +240,14 @@ def rank_genes_groups_degradation(adata, groupby, groups, reference, method = 't
   sc.pl.rank_genes_groups(adata, groups = groups, n_genes=n_genes, show = False, key = 'rank_genes_groups_degradation')
   rank_genes_degradation = list(adata.uns['rank_genes_groups_degradation']['names'][groups[0]])
   return rank_genes_degradation
+
+def visualization_kinetics(adata, gene, save_path=None):
+  fig, axes = plt.subplots(1, 3, figsize=(5 * 3, 5 * 1))
+  sc.pl.umap(adata, color=gene, layer = 's_hat', show=False, ax=axes[0], colorbar_loc = None, frameon = False)
+  axes[0].set_title(f'{gene} exspression')
+  sc.pl.umap(adata, color=gene, layer = 'splicing_rate', show=False, ax=axes[1], color_map = 'Blues', colorbar_loc = None, frameon = False)
+  axes[1].set_title(f'{gene} splicing rates')
+  sc.pl.umap(adata, color=gene, layer = 'degradation_rate', show=False, ax=axes[2], color_map = 'Reds', colorbar_loc = None, frameon = False)
+  axes[2].set_title(f'{gene} degradation rates')
+  if save_path != None:
+    fig.savefig(save_path)
