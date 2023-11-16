@@ -167,7 +167,7 @@ def plt_beta_gamma(adata):
         sns.violinplot(y=name,orient='v',ax=ax).set_title('gene={}'.format(adata.var_names[i]))
 
 
-def embedding_func(adata, color, save_path = '.deepkinet_velocity.png', embeddings = 'X_umap', n_neighbors = 30):
+def embedding_func(adata, color, save_path = '.deepkinet_velocity.png', embeddings = 'X_umap', n_neighbors = 30, velocity_pseudotime = False):
 
     adata_z = ad.AnnData(adata.obsm['latent_variable'])
     adata_z.obs_names = adata.obs_names
@@ -185,5 +185,6 @@ def embedding_func(adata, color, save_path = '.deepkinet_velocity.png', embeddin
     scv.tl.velocity_graph(adata_z,vkey='latent_velocity',xkey='latent_variable')
     scv.pl.velocity_embedding_grid(adata_z, basis='X_original_umap',X=adata_z.obsm['X_original_umap'],vkey='latent_velocity', width=0.002, arrow_length=1,headwidth=10, density=0.4, arrow_color='black', color=color, save = save_path)
     
-    scv.tl.velocity_pseudotime(adata_z, vkey='latent_velocity')
-    adata.obs['latent_velocity_pseudotime'] = adata_z.obs['latent_velocity_pseudotime']
+    if velocity_pseudotime:
+        scv.tl.velocity_pseudotime(adata_z, vkey='latent_velocity')
+        adata.obs['latent_velocity_pseudotime'] = adata_z.obs['latent_velocity_pseudotime']
