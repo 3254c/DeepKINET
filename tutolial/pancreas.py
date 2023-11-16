@@ -1,6 +1,6 @@
 import scvelo as scv
 import sys
-sys.path.append('src/DeepKINET')
+sys.path.append('src/deepkinet')
 import workflow
 import utils
 import scanpy as sc
