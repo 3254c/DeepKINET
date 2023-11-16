@@ -249,5 +249,5 @@ def rank_genes_groups_splicing(adata, groupby, groups, reference, method = 't-te
 def rank_genes_groups_degradation(adata, groupby, groups, reference, method = 't-test', n_genes=20):
   sc.tl.rank_genes_groups(adata, groupby = groupby, layer = 'degradation_rate', groups=groups, reference=reference, method=method, key_added = 'rank_genes_groups_degradation')
   sc.pl.rank_genes_groups(adata, groups = groups, n_genes=n_genes, show = False, key = 'rank_genes_groups_degradation')
-  rank_genes_degradation = list(adata.uns['rank_genes_groups_degradation'][groups[0]])
+  rank_genes_degradation = list(adata.uns['rank_genes_groups_degradation']['names'][groups[0]])
   return rank_genes_degradation
