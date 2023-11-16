@@ -185,19 +185,6 @@ def embedding_func(adata, color, save_path = '.latent_velocity.png', embeddings 
     scv.tl.velocity_graph(adata_z,vkey='latent_velocity',xkey='latent_variable')
     scv.pl.velocity_embedding_grid(adata_z, basis='X_original_umap',X=adata_z.obsm['X_original_umap'],vkey='latent_velocity', width=0.002, arrow_length=1,headwidth=10, density=0.4, arrow_color='black', color=color, save = save_path)
 
-def latent_velocity_pseudotime(adata):
-
-    adata_z = ad.AnnData(adata.obsm['latent_variable'])
-    adata_z.obs_names = adata.obs_names
-    adata_z.layers['latent_variable'] = adata.obsm['latent_variable']
-    adata_z.obsm['latent_variable'] = adata.obsm['latent_variable']
-    adata_z.layers['latent_velocity'] = adata.obsm['latent_velocity']
-    adata_z.obsm['latent_velocity'] = adata.obsm['latent_velocity']
-
-    scv.tl.velocity_graph(adata_z,vkey='latent_velocity',xkey='latent_variable')
-    scv.tl.velocity_pseudotime(adata_z, vkey='latent_velocity')
-    adata.obs['latent_velocity_pseudotime'] = adata_z.obs['latent_velocity_pseudotime']
-
 def kinetic_rate_cluster_separate(adata):
   #cluster解析
   sc.pp.neighbors(adata, n_neighbors=30, use_rep='latent_variable')
