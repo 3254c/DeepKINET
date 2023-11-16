@@ -228,7 +228,9 @@ def kinetic_rate_cluster_both(adata):
   sc.pp.neighbors(adata, n_neighbors=30, use_rep='latent_variable')
 
   splicing_rate_z_np = (adata.layers['splicing_rate'] - adata.layers['splicing_rate'].mean(axis = 0)) / adata.layers['splicing_rate'].std(axis = 0)
+  adata.layers['splicing_rate_z'] = splicing_rate_z_np
   degradation_rate_z_np = (adata.layers['degradation_rate'] - adata.layers['degradation_rate'].mean(axis = 0)) /adata.layers['degradation_rate'].std(axis = 0)
+  adata.layers['degradation_rate_z'] = degradation_rate_z_np
 
   kinetic_rate_np_T = np.concatenate([splicing_rate_z_np.T, degradation_rate_z_np.T], axis =1)
   adata_kinetic_rate_T = ad.AnnData(kinetic_rate_np_T)
