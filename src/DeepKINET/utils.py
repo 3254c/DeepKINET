@@ -194,5 +194,6 @@ def latent_velocity_pseudotime(adata):
     adata_z.layers['latent_velocity'] = adata.obsm['latent_velocity']
     adata_z.obsm['latent_velocity'] = adata.obsm['latent_velocity']
 
+    scv.tl.velocity_graph(adata_z,vkey='latent_velocity',xkey='latent_variable')
     scv.tl.velocity_pseudotime(adata_z, vkey='latent_velocity')
     adata.obs['latent_velocity_pseudotime'] = adata_z.obs['latent_velocity_pseudotime']
