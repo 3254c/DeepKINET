@@ -2,7 +2,7 @@ import torch
 import utils
 import numpy as np
 
-def estimate_kinetics(adata, color, epoch = 2000, learned_checkpoint = None, loss_mode = 'poisson', checkpoint='.deepkinet_opt.pt', lr = 0.001):
+def estimate_kinetics(adata, epoch = 2000, learned_checkpoint = None, loss_mode = 'poisson', checkpoint='.deepkinet_opt.pt', lr = 0.001):
 
     model_params = {}
     model_params['x_dim'] = adata.n_vars
