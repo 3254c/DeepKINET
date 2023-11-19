@@ -1,7 +1,9 @@
 # DeepKINET (A Deep Generative Model with Single Cell RNA Kinetics)
 DeepKINET is a deep generative model to estimate mRNA kinetic rates at the single-cell level.
 
-[Teppei Shimamura' lab](https://www.shimamlab.info/), Tokyo Medical and Dental university at Tokyo and Nagoya University at Nagoya
+[Teppei Shimamura's lab](https://www.shimamlab.info/), Tokyo Medical and Dental university at Tokyo and Nagoya University at Nagoya
+
+[Yasuhiro Kojima's lab](https://www.ncc.go.jp/jp/ri/division/computational_life_science),   National Cancer Center Research Institute at Tokyo
 
 Developed by Chikara Mizukoshi
 
