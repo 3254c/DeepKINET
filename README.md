@@ -12,6 +12,7 @@ git clone https://github.com/3254c/XXX
 ```
 
 # Usage
+Estimation of splicing and degradation rates at the single cell level, gene clustering using these rates, and obtaining a list of genes with significant rate variation among cell populations can be performed in the ipynb file included in tutolial.
 ## Estimate cellular kineics
 You need to prepare anndata, including count data for unspliced and spliced transcripts.
 When filtering genes or cells, any transformations such as normalization or log transformations must be converted back to raw count data before use.
