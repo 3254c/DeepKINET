@@ -6,9 +6,13 @@ DeepKINET is a deep generative model to estimate mRNA kinetic rates at the singl
 Developed by Chikara Mizukoshi
 
 # Instalation
-You can install DeepKINET using following command
+You can install DeepKINET using following command.
 ```
-git clone https://github.com/3254c/XXX
+pip install deepkinet
+```
+Or you can use the latest development version from GitHub.
+```
+git clone https://github.com/3254c/DeepKINET
 ```
 
 # Usage
