@@ -39,5 +39,5 @@ deepkinet.visualization_kinetics(adata, gene_a)
 gene_b = 'Cpe'
 deepkinet.visualization_kinetics(adata, gene_b)
 ```
-.. image:: tutolial/visualization_pancreas_kinetics.png
-  :width: 100%
+
+![visualization_pancreas_kinetics](tutolial/visualization_pancreas_kinetics.png)
