@@ -18,7 +18,8 @@ git clone https://github.com/3254c/DeepKINET
 ```
 
 # Usage
-Estimation of splicing and degradation rates at the single cell level, gene clustering using these rates, and obtaining a list of genes with significant rate variation among cell populations can be performed in the ipynb file included in tutolial.
+Estimation of splicing and degradation rates at the single cell level, gene clustering using these rates, and obtaining a list of genes with significant rate variation among cell populations can be performed in the [IPython Notebook](tutolial/DeepKINET_tutolial.ipynb) included in tutolial.
+
 ## Estimate cellular kinetics
 You need to prepare anndata, including count data for unspliced and spliced transcripts.
 When filtering genes or cells, any transformations such as normalization or log transformations must be converted back to raw count data before use.
@@ -42,4 +43,5 @@ gene_b = 'Cpe'
 deepkinet.visualization_kinetics(adata, gene_b)
 ```
 
-![visualization_pancreas_kinetics](tutolial/visualization_pancreas_kinetics.png)
+![visualization_pancreas_kinetics Actn4](tutolial/visualization_pancreas_kinetics_Actn4.png)
+![visualization_pancreas_kinetics_Cpe](tutolial/visualization_pancreas_kinetics_Cpe.png)
