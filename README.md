@@ -18,7 +18,7 @@ git clone https://github.com/3254c/DeepKINET
 ```
 
 # Usage
-Estimation of splicing and degradation rates at the single cell level, gene clustering using these rates, and obtaining a list of genes with significant rate variation among cell populations can be performed in the [IPython Notebook](tutorial/DeepKINET_tutorial.ipynb) included in tutolial.
+Estimation of splicing and degradation rates at the single cell level, gene clustering using these rates, and obtaining a list of genes with significant rate variation among cell populations can be performed in the [IPython Notebook](tutolial/DeepKINET_tutolial.ipynb) included in tutolial.
 
 ## Estimate cellular kinetics
 You need to prepare anndata, including count data for unspliced and spliced transcripts.
