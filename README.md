@@ -43,5 +43,5 @@ gene_b = 'Cpe'
 deepkinet.visualization_kinetics(adata, gene_b)
 ```
 
-![visualization_pancreas_kinetics Actn4](tutolial/visualization_pancreas_kinetics_Actn4.png)
-![visualization_pancreas_kinetics_Cpe](tutolial/visualization_pancreas_kinetics_Cpe.png)
+![visualization_pancreas_kinetics Actn4](tutorial/visualization_pancreas_kinetics_Actn4.png)
+![visualization_pancreas_kinetics_Cpe](tutorial/visualization_pancreas_kinetics_Cpe.png)
