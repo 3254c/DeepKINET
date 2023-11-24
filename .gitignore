@@ -3,3 +3,8 @@ vicdyf-env/
 data
 pancreas_Actn4_Cpe.png
 figures
+build/
+dist/
+src/DeepKINET.egg-info/
+#Wあなたのパッケージ名.egg-info/
+.pypirc
