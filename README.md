@@ -8,6 +8,12 @@ DeepKINET is a deep generative model to estimate mRNA kinetic rates at the singl
 Developed by Chikara Mizukoshi
 
 # Instalation
+You can use the latest development version from GitHub.
+```
+!git clone https://github.com/3254c/DeepKINET.git
+```
+
+<!-- 
 You can install DeepKINET using following command.
 ```
 pip install deepkinet
@@ -16,6 +22,7 @@ Or you can use the latest development version from GitHub.
 ```
 git clone https://github.com/3254c/DeepKINET
 ```
+-->
 
 # Usage
 Estimation of splicing and degradation rates at the single cell level, gene clustering using these rates, and obtaining a list of genes with significant rate variation among cell populations can be performed in the [IPython Notebook](tutorial/DeepKINET_tutorial.ipynb) included in tutolial.
