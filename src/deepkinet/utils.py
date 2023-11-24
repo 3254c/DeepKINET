@@ -36,36 +36,36 @@ def define_exp(adata, model_params, lr, val_ratio, test_ratio,batch_size, num_wo
     s = s.float()
     u = u.float()
 
-    vicdyf_exp = exp.DeepKINETExperiment(model_params, lr, s, u, test_ratio, batch_size, num_workers, checkpoint, val_ratio)
-    return(vicdyf_exp)
+    deepkinet_exp = exp.DeepKINETExperiment(model_params, lr, s, u, test_ratio, batch_size, num_workers, checkpoint, val_ratio)
+    return(deepkinet_exp)
 
-def post_process(adata, vicdyf_exp):
-    s = vicdyf_exp.edm.s
-    u = vicdyf_exp.edm.u
-    train_idx = vicdyf_exp.edm.train_idx
-    val_idx = vicdyf_exp.edm.validation_idx
-    test_idx = vicdyf_exp.edm.test_idx
+def post_process(adata, deepkinet_exp):
+    s = deepkinet_exp.edm.s
+    u = deepkinet_exp.edm.u
+    train_idx = deepkinet_exp.edm.train_idx
+    val_idx = deepkinet_exp.edm.validation_idx
+    test_idx = deepkinet_exp.edm.test_idx
     adata.uns['train_idx']=train_idx.tolist()
     adata.uns['val_idx']=val_idx.tolist()
     adata.uns['test_idx']=test_idx.tolist()
 
-    vicdyf_exp.device = torch.device('cpu')
-    vicdyf_exp.model = vicdyf_exp.model.to(vicdyf_exp.device)
+    deepkinet_exp.device = torch.device('cpu')
+    deepkinet_exp.model = deepkinet_exp.model.to(deepkinet_exp.device)
 
-    z, d, qz, qd, s_hat, diff_px_zd_ld, pu_zd_ld  = vicdyf_exp.model(s, u)
+    z, d, qz, qd, s_hat, diff_px_zd_ld, pu_zd_ld  = deepkinet_exp.model(s, u)
     zl = qz.loc
-    d, qd = vicdyf_exp.model.enc_d(zl)
-    px_z_ld = vicdyf_exp.model.dec_z(zl)
-    norm_mat=vicdyf_exp.edm.norm_mat
+    d, qd = deepkinet_exp.model.enc_d(zl)
+    px_z_ld = deepkinet_exp.model.dec_z(zl)
+    norm_mat=deepkinet_exp.edm.norm_mat
     norm_mat_np = norm_mat.cpu().detach().numpy()
-    norm_mat_u=vicdyf_exp.edm.norm_mat_u
+    norm_mat_u=deepkinet_exp.edm.norm_mat_u
     norm_mat_u_np = norm_mat_u.cpu().detach().numpy()
 
     adata.layers['norm_mat'] = norm_mat_np
     adata.layers['norm_mat_u'] = norm_mat_u_np
 
-    each_beta = vicdyf_exp.model.dec_b(zl) * vicdyf_exp.model.dt
-    each_gamma = vicdyf_exp.model.dec_g(zl) * vicdyf_exp.model.dt
+    each_beta = deepkinet_exp.model.dec_b(zl) * deepkinet_exp.model.dt
+    each_gamma = deepkinet_exp.model.dec_g(zl) * deepkinet_exp.model.dt
     adata.layers['splicing_rate'] = each_beta.cpu().detach().numpy()
     adata.layers['degradation_rate'] = each_gamma.cpu().detach().numpy()
 
@@ -75,10 +75,10 @@ def post_process(adata, vicdyf_exp):
     adata.obsm['latent_velocity'] = dl.cpu().detach().numpy()
     adata.obsm['latent_velocity_sample'] = d.cpu().detach().numpy()
 
-    diff_px_zd_ld = vicdyf_exp.model.calculate_diff_x_grad(zl, dl)
+    diff_px_zd_ld = deepkinet_exp.model.calculate_diff_x_grad(zl, dl)
 
     raw_u_ld = (diff_px_zd_ld + s_hat * each_gamma) / each_beta
-    pu_zd_ld = raw_u_ld + vicdyf_exp.model.relu(- raw_u_ld).detach()
+    pu_zd_ld = raw_u_ld + deepkinet_exp.model.relu(- raw_u_ld).detach()
 
     adata.layers['pu_zd_ld'] = pu_zd_ld.cpu().detach().numpy()
     px_z_ld_df = pd.DataFrame(px_z_ld.cpu().detach().numpy(),columns=list(adata.var_names))
@@ -108,7 +108,7 @@ def post_process(adata, vicdyf_exp):
     print('test_s_correlation', test_s_correlation)
     print('test_u_correlation', test_u_correlation)
 
-    adata.layers['DeepKINET_velocity'] = vicdyf_exp.model.calculate_diff_x_grad(zl, dl).cpu().detach().numpy()
+    adata.layers['DeepKINET_velocity'] = deepkinet_exp.model.calculate_diff_x_grad(zl, dl).cpu().detach().numpy()
     adata.obs['DeepKINET_velocity'] = np.mean(np.abs(adata.layers['DeepKINET_velocity']), axis=1)
 
     results_dict = {
@@ -155,7 +155,7 @@ def plt_beta_gamma(adata):
     fig=plt.figure(figsize=(30,30))
     for i,name in enumerate(adata.layers['lambda'].T[:16]):
         ax=plt.subplot(4,4,i+1)
-        ax.set_xlabel('vicdyf_expression of {}'.format(adata.var_names[i]))
+        ax.set_xlabel('DeepKINET_expression of {}'.format(adata.var_names[i]))
         ax.set_ylim(0, 5)
         sns.violinplot(y=name,orient='v',ax=ax).set_title('gene={}'.format(adata.var_names[i]))
 

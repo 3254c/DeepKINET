@@ -40,7 +40,7 @@ class Encoder(nn.Module):
 
     def forward(self, x):
         h = self.x2h(x)
-        mu = self.h2mu(h)#意外とこの隠れ層→隠れ層って構造なくてもいい気がする。
+        mu = self.h2mu(h)
         logvar = self.h2logvar(h)
         qz = self.dist(mu, self.softplus(logvar))
         z = qz.rsample()
@@ -61,7 +61,7 @@ class Encoder_of_s_u(nn.Module):
         s_u = torch.cat([s, u], dim=1)
         pre_h = self.x2h(s_u)
         post_h = self.seq_nn(pre_h)
-        mu = self.h2mu(post_h)#意外とこの隠れ層→隠れ層って構造なくてもいい気がする。
+        mu = self.h2mu(post_h)
         logvar = self.h2logvar(post_h)
         qz = self.dist(mu, self.softplus(logvar))
         z = qz.rsample()
@@ -108,23 +108,14 @@ class DeepKINET(nn.Module):
         init.normal_(self.logtheta)
 
     def calc_z_d_kld(self, qz):
-      #kl_divergence(qz, dist.Normal(*self.pz_params)).sum(-1)
         kld = -0.5 * (1 + qz.scale.pow(2).log() - qz.loc.pow(2) - qz.scale.pow(2))
         return(kld.sum(dim=-1))
 
     def calculate_diff_x_grad(self, z, d):
         dec_f = lambda vz: self.dec_z(vz)
-        #print(functorch.jvp(dec_f, (z, ), (d, ))[0].shape,functorch.jvp(dec_f, (z, ), (d, ))[1].shape) #torch.Size([100, 2000]) torch.Size([100, 2000])
-        dec_jvp = lambda vz, vd: functorch.jvp(dec_f, (vz, ), (vd, ))[1]#(z, d) → (f(z), df(z)*d) #df(z)は押し出しにより 10 → 2000次元であり、空間R10でのzの接空間を空間R2000での出力点f(z)の接空間に移す線型写像 R 10*2000 dims
-        diff_px_zd_ld = self.d_coeff * functorch.vmap(dec_jvp, in_dims=(0, 0))(z, d) #(100, 2000)
+        dec_jvp = lambda vz, vd: functorch.jvp(dec_f, (vz, ), (vd, ))[1]
+        diff_px_zd_ld = self.d_coeff * functorch.vmap(dec_jvp, in_dims=(0, 0))(z, d)
         return diff_px_zd_ld
-
-    def calculate_diff_x_std(self, z, dscale): #zのsizeは100 * 10とかcells *10のはず
-        d_id = torch.eye(z.size()[1], z.size()[1]).to(z.device) #10*10の単位行列作る(対角成分が1で他は0)
-        gene_vel_std = sum([
-            (self.calculate_diff_x_grad(z, repeat(delta_d, 'd -> b d', b=z.size()[0])) * dscale[:, i].unsqueeze(1))**2
-            for delta_d, i in zip(d_id, range(dscale.size()[1]))]).sqrt()
-        return gene_vel_std
 
     def calc_poisson_loss(self, ld, norm_mat, obs):
         p_z = dist.Poisson(ld * norm_mat+ 1.0e-16)

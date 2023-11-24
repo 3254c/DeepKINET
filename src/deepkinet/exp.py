@@ -6,29 +6,29 @@ from statistics import mean
 
 class EarlyStopping:
     def __init__(self, patience, path):
-        self.patience = patience    #設定ストップカウンタ
-        self.counter = 0            #現在のカウンタ値
-        self.best_score = None      #ベストスコア
-        self.early_stop = False     #ストップフラグ
-        self.val_loss_min = np.Inf   #前回のベストスコア記憶用
-        self.path = path             #ベストモデル格納path
+        self.patience = patience
+        self.counter = 0
+        self.best_score = None
+        self.early_stop = False
+        self.val_loss_min = np.Inf
+        self.path = path
 
     def __call__(self, val_loss, model):
         score =  - val_loss
-        if self.best_score is None:  #1Epoch目の処理
-            self.best_score = score   #1Epoch目はそのままベストスコアとして記録する
-            self.checkpoint(val_loss, model)  #記録後にモデルを保存してスコア表示する
-        elif score < self.best_score:  # ベストスコアを更新できなかった場合
-            self.counter += 1   #ストップカウンタを+1
-            if self.counter >= self.patience:  #設定カウントを上回ったらストップフラグをTrueに変更
+        if self.best_score is None:
+            self.best_score = score
+            self.checkpoint(val_loss, model)
+        elif score < self.best_score:
+            self.counter += 1
+            if self.counter >= self.patience:
                 self.early_stop = True
-        else:  #ベストスコアを更新した場合
-            self.best_score = score  #ベストスコアを上書き
-            self.checkpoint(val_loss, model)  #モデルを保存してスコア表示
-            self.counter = 0  #ストップカウンタリセット
+        else:
+            self.best_score = score
+            self.checkpoint(val_loss, model)
+            self.counter = 0
     def checkpoint(self, val_loss, model):
-        torch.save(model.state_dict(), self.path)  #ベストモデルを指定したpathに保存
-        self.val_loss_min = val_loss  #その時のlossを記録する
+        torch.save(model.state_dict(), self.path)
+        self.val_loss_min = val_loss
 
 class DeepKINETExperiment:
     def __init__(self, model_params, lr, s, u,  test_ratio, batch_size, num_workers, checkpoint, validation_ratio):
@@ -89,8 +89,8 @@ class DeepKINETExperiment:
             val_loss_post_mean = mean(val_loss_list[-val_loss_mean_num:])
             if epoch % 100 == 0:
               print(f'val loss mean (post {val_loss_mean_num} epochs) at epoch {epoch} is {val_loss_post_mean}')
-            earlystopping(val_loss_post_mean, self.model) #callメソッド呼び出し
-            if earlystopping.early_stop: #ストップフラグがTrueの場合、breakでforループを抜ける
+            earlystopping(val_loss_post_mean, self.model)
+            if earlystopping.early_stop:
               print(f"Early Stopping! at {epoch} epoch")
               break
 
