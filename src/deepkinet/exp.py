@@ -31,13 +31,13 @@ class EarlyStopping:
         self.val_loss_min = val_loss
 
 class DeepKINETExperiment:
-    def __init__(self, model_params, lr, s, u,  test_ratio, batch_size, num_workers, checkpoint, validation_ratio):
+    def __init__(self, model_params, lr, weight_decay, s, u,  test_ratio, batch_size, num_workers, checkpoint, validation_ratio):
         self.edm = DeepKINETDataManager(s, u, test_ratio, batch_size, num_workers, validation_ratio)
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model = DeepKINET(**model_params)
         self.model_params = model_params
         self.model.to(self.device)
-        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=lr)
+        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=lr, weight_decay=weight_decay)
         self.checkpoint=checkpoint
         self.lr = lr
 
@@ -94,5 +94,5 @@ class DeepKINETExperiment:
               print(f"Early Stopping! at {epoch} epoch")
               break
 
-    def init_optimizer(self, lr):
-        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=lr)
+    def init_optimizer(self, lr, weight_decay):
+        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=lr, weight_decay=weight_decay)

@@ -2,13 +2,13 @@ import torch
 import utils
 import numpy as np
 
-def estimate_kinetics(adata, epoch = 2000, learned_checkpoint = None, loss_mode = 'poisson', checkpoint='.deepkinet_opt.pt', lr = 0.001):
+def estimate_kinetics(adata, epoch = 2000, learned_checkpoint = None, loss_mode = 'poisson', checkpoint='.deepkinet_opt.pt', lr = 0.001, weight_decay=0.01):
 
     model_params = {}
     model_params['x_dim'] = adata.n_vars
     model_params['loss_mode'] = loss_mode
 
-    deepkinet_exp = utils.define_exp(adata, model_params = model_params, lr = lr, val_ratio=0.10, test_ratio = 0.05, batch_size = 100, num_workers = 2, checkpoint = checkpoint)
+    deepkinet_exp = utils.define_exp(adata, model_params = model_params, lr = lr, weight_decay = weight_decay, val_ratio=0.10, test_ratio = 0.05, batch_size = 100, num_workers = 2, checkpoint = checkpoint)
 
     adata.uns['Dynamics_last_val_loss'] = np.array([0])
     adata.uns['Dynamics_last_test_loss'] = np.array([0])
@@ -22,7 +22,7 @@ def estimate_kinetics(adata, epoch = 2000, learned_checkpoint = None, loss_mode 
         print('Dynamics opt patience',patience)
         deepkinet_exp.model.dynamics = True
         deepkinet_exp.model.kinetics = False
-        deepkinet_exp.init_optimizer(lr)
+        deepkinet_exp.init_optimizer(lr, weight_decay)
         deepkinet_exp.train_total(epoch, patience)
         deepkinet_exp.model.load_state_dict(torch.load(checkpoint))
         print('Done Dynamics opt')
@@ -44,7 +44,7 @@ def estimate_kinetics(adata, epoch = 2000, learned_checkpoint = None, loss_mode 
             param.requires_grad = True
         for param in deepkinet_exp.model.dec_g.parameters():
             param.requires_grad = True
-        deepkinet_exp.init_optimizer(lr)
+        deepkinet_exp.init_optimizer(lr, weight_decay)
         deepkinet_exp.train_total(epoch, patience)
         deepkinet_exp.model.load_state_dict(torch.load(checkpoint))
         print('Done Kinetics opt')

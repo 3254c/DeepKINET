@@ -21,7 +21,7 @@ def input_checks(adata):
         raise ValueError('layers `unspliced` includes non integer number, while count data is required for `unspliced`.')
 
 
-def define_exp(adata, model_params, lr, val_ratio, test_ratio,batch_size, num_workers,checkpoint):
+def define_exp(adata, model_params, lr, weight_decay, val_ratio, test_ratio,batch_size, num_workers,checkpoint):
     input_checks(adata)
 
     if type(adata.layers['spliced']) == np.ndarray:
@@ -36,7 +36,7 @@ def define_exp(adata, model_params, lr, val_ratio, test_ratio,batch_size, num_wo
     s = s.float()
     u = u.float()
 
-    deepkinet_exp = exp.DeepKINETExperiment(model_params, lr, s, u, test_ratio, batch_size, num_workers, checkpoint, val_ratio)
+    deepkinet_exp = exp.DeepKINETExperiment(model_params, lr, weight_decay, s, u, test_ratio, batch_size, num_workers, checkpoint, val_ratio)
     return(deepkinet_exp)
 
 def post_process(adata, deepkinet_exp):
