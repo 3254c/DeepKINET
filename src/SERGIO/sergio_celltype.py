@@ -1,3 +1,5 @@
+#This code is cited from Dibaeinia P, Sinha S. SERGIO: A Single-Cell Expression Simulator Guided by Gene Regulatory Networks. Cell Syst. 2020.
+
 import numpy as np
 from gene_celltype import gene
 import sys
