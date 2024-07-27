@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/705480558.svg)](https://zenodo.org/doi/10.5281/zenodo.13054695)
+
 # DeepKINET (A Deep Generative Model with Single Cell RNA Kinetics)
 DeepKINET is a deep generative model to estimate mRNA kinetic rates at the single-cell level.
 
