@@ -2,9 +2,14 @@ vicdyf-env/
 .deepkinet_opt.pt
 data
 pancreas_Actn4_Cpe.png
+*.jpg
 figures
 build/
 dist/
 src/DeepKINET.egg-info/
 #Wあなたのパッケージ名.egg-info/
 .pypirc
+tutorial/tutolial.py
+__pycache__/
+*.pyc
+remove_pycache.py
