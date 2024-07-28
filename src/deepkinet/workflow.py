@@ -2,12 +2,15 @@ import torch
 import utils
 import numpy as np
 
-def estimate_kinetics(adata, epoch = 2000, learned_checkpoint = None, loss_mode = 'poisson', checkpoint='.deepkinet_opt.pt', lr = 0.001, weight_decay=0.01):
+def estimate_kinetics(adata, epoch = 2000, learned_checkpoint = None, loss_mode = 'poisson', checkpoint='.deepkinet_opt.pt', lr = 0.001, weight_decay=0.01, batch_key=None):
 
     model_params = {}
     model_params['x_dim'] = adata.n_vars
     model_params['loss_mode'] = loss_mode
-
+    model_params['batch_key'] = batch_key
+    batch_onehot = make_sample_one_hot_mat(adata, batch_key)
+    model_params['batch_onehot'] = batch_onehot
+    
     deepkinet_exp = utils.define_exp(adata, model_params = model_params, lr = lr, weight_decay = weight_decay, val_ratio=0.10, test_ratio = 0.05, batch_size = 100, num_workers = 2, checkpoint = checkpoint)
 
     adata.uns['Dynamics_last_val_loss'] = np.array([0])
@@ -63,3 +66,17 @@ def estimate_kinetics(adata, epoch = 2000, learned_checkpoint = None, loss_mode 
 
     results_dict = utils.post_process(adata, deepkinet_exp)
     return(adata, deepkinet_exp)
+
+
+def make_sample_one_hot_mat(adata, sample_key):
+    print('make_sample_one_hot_mat')
+    if sample_key is not None:
+        sidxs = np.sort(adata.obs[sample_key].unique())
+        b = np.array([
+            (sidxs == sidx).astype(int)
+            for sidx in adata.obs[sample_key]]).astype(float)
+        b = torch.tensor(b).float()
+    else:
+        b = np.zeros((len(adata.obs_names), 1))
+        b = torch.tensor(b).float()
+    return b

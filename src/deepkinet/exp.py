@@ -32,7 +32,7 @@ class EarlyStopping:
 
 class DeepKINETExperiment:
     def __init__(self, model_params, lr, weight_decay, s, u,  test_ratio, batch_size, num_workers, checkpoint, validation_ratio):
-        self.edm = DeepKINETDataManager(s, u, test_ratio, batch_size, num_workers, validation_ratio)
+        self.edm = DeepKINETDataManager(s, u, test_ratio, batch_size, num_workers, validation_ratio, model_params['batch_onehot'])
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model = DeepKINET(**model_params)
         self.model_params = model_params
@@ -45,13 +45,14 @@ class DeepKINETExperiment:
         self.model.train()
         total_loss = 0
         entry_num = 0
-        for s, u, norm_mat, norm_mat_u in self.edm.train_loader:
+        for s, u, norm_mat, norm_mat_u, batch_onehot in self.edm.train_loader:
             s = s.to(self.device)
             u = u.to(self.device)
             norm_mat = norm_mat.to(self.device)
             norm_mat_u = norm_mat_u.to(self.device)
+            batch_onehot = batch_onehot.to(self.device)
             self.optimizer.zero_grad()
-            loss = self.model.elbo_loss(s, u, norm_mat, norm_mat_u)
+            loss = self.model.elbo_loss(s, u, norm_mat, norm_mat_u, batch_onehot)
             loss.backward()
             self.optimizer.step()
             total_loss = total_loss + loss.item()
@@ -64,7 +65,8 @@ class DeepKINETExperiment:
         u = self.edm.validation_u.to(self.device)
         norm_mat = self.edm.validation_norm_mat.to(self.device)
         norm_mat_u = self.edm.validation_norm_mat_u.to(self.device)
-        loss = self.model.elbo_loss(s, u, norm_mat, norm_mat_u)
+        batch_onehot = self.edm.validation_batch_onehot.to(self.device)
+        loss = self.model.elbo_loss(s, u, norm_mat, norm_mat_u, batch_onehot)
         entry_num = s.shape[0]
         return(loss / entry_num)
 
@@ -74,7 +76,8 @@ class DeepKINETExperiment:
         u = self.edm.test_u.to(self.device)
         norm_mat = self.edm.test_norm_mat.to(self.device)
         norm_mat_u = self.edm.test_norm_mat_u.to(self.device)
-        loss = self.model.elbo_loss(s, u, norm_mat, norm_mat_u)
+        batch_onehot = self.edm.test_batch_onehot.to(self.device)
+        loss = self.model.elbo_loss(s, u, norm_mat, norm_mat_u, batch_onehot)
         entry_num = s.shape[0]
         return(loss / entry_num)
 

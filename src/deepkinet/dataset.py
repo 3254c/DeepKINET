@@ -2,11 +2,12 @@ import torch
 import numpy as np
 
 class DeepKINETDataSet(torch.utils.data.Dataset):
-    def __init__(self, s, u, norm_mat, norm_mat_u):
+    def __init__(self, s, u, norm_mat, norm_mat_u, batch_onehot):
         self.s = s
         self.u = u
         self.norm_mat = norm_mat
         self.norm_mat_u = norm_mat_u
+        self.batch_onehot = batch_onehot
     def __len__(self):
         return(self.s.shape[0])
     def __getitem__(self, idx):
@@ -14,11 +15,12 @@ class DeepKINETDataSet(torch.utils.data.Dataset):
         idx_u = self.u[idx]
         idx_norm_mat = self.norm_mat[idx]
         idx_norm_mat_u = self.norm_mat_u[idx]
-        return(idx_s, idx_u, idx_norm_mat, idx_norm_mat_u)
+        idx_batch_onehot = self.batch_onehot[idx]
+        return(idx_s, idx_u, idx_norm_mat, idx_norm_mat_u, idx_batch_onehot)
 
 
 class DeepKINETDataManager():
-    def __init__(self, s, u, test_ratio, batch_size, num_workers, validation_ratio):
+    def __init__(self, s, u, test_ratio, batch_size, num_workers, validation_ratio, batch_onehot):
         snorm_mat = torch.mean(s, dim=1, keepdim=True) * torch.mean(s, dim=0, keepdim=True)
         snorm_mat =  torch.mean(s) * snorm_mat / torch.mean(snorm_mat)
         unorm_mat = torch.mean(u, dim=1, keepdim=True) * torch.mean(u, dim=0, keepdim=True)
@@ -42,6 +44,9 @@ class DeepKINETDataManager():
         self.test_u = u[test_idx]
         self.test_norm_mat = self.norm_mat[test_idx]
         self.test_norm_mat_u = self.norm_mat_u[test_idx]
-        self.train_eds = DeepKINETDataSet(self.s[train_idx], self.u[train_idx], self.norm_mat[train_idx], self.norm_mat_u[train_idx])
+        self.batch_onehot = batch_onehot
+        self.validation_batch_onehot = batch_onehot[validation_idx]
+        self.test_batch_onehot = batch_onehot[test_idx]
+        self.train_eds = DeepKINETDataSet(self.s[train_idx], self.u[train_idx], self.norm_mat[train_idx], self.norm_mat_u[train_idx], self.batch_onehot[train_idx])
         self.train_loader = torch.utils.data.DataLoader(
             self.train_eds, batch_size=batch_size, shuffle=True, num_workers=num_workers, drop_last=True, pin_memory=True)

@@ -42,6 +42,8 @@ def define_exp(adata, model_params, lr, weight_decay, val_ratio, test_ratio,batc
 def post_process(adata, deepkinet_exp):
     s = deepkinet_exp.edm.s
     u = deepkinet_exp.edm.u
+    batch_onehot = deepkinet_exp.edm.batch_onehot
+    
     train_idx = deepkinet_exp.edm.train_idx
     val_idx = deepkinet_exp.edm.validation_idx
     test_idx = deepkinet_exp.edm.test_idx
@@ -52,10 +54,11 @@ def post_process(adata, deepkinet_exp):
     deepkinet_exp.device = torch.device('cpu')
     deepkinet_exp.model = deepkinet_exp.model.to(deepkinet_exp.device)
 
-    z, d, qz, qd, s_hat, diff_px_zd_ld, pu_zd_ld  = deepkinet_exp.model(s, u)
+    z, d, qz, qd, s_hat, diff_px_zd_ld, pu_zd_ld  = deepkinet_exp.model(s, u, batch_onehot)
     zl = qz.loc
     d, qd = deepkinet_exp.model.enc_d(zl)
-    px_z_ld = deepkinet_exp.model.dec_z(zl)
+    dl = qd.loc
+
     norm_mat=deepkinet_exp.edm.norm_mat
     norm_mat_np = norm_mat.cpu().detach().numpy()
     norm_mat_u=deepkinet_exp.edm.norm_mat_u
@@ -64,18 +67,28 @@ def post_process(adata, deepkinet_exp):
     adata.layers['norm_mat'] = norm_mat_np
     adata.layers['norm_mat_u'] = norm_mat_u_np
 
-    each_beta = deepkinet_exp.model.dec_b(zl) * deepkinet_exp.model.dt
-    each_gamma = deepkinet_exp.model.dec_g(zl) * deepkinet_exp.model.dt
+    if deepkinet_exp.model.batch_key is None:
+        px_z_ld = deepkinet_exp.model.dec_z(zl)
+        each_beta = deepkinet_exp.model.dec_b(zl) * deepkinet_exp.model.dt
+        each_gamma = deepkinet_exp.model.dec_g(zl) * deepkinet_exp.model.dt
+        diff_px_zd_ld = deepkinet_exp.model.calculate_diff_x_grad(zl, dl)
+        adata.layers['DeepKINET_velocity'] = deepkinet_exp.model.calculate_diff_x_grad(zl, dl).cpu().detach().numpy()
+    else:
+        px_z_ld = deepkinet_exp.model.dec_z(zl, batch_onehot)
+        each_beta = deepkinet_exp.model.dec_b(zl, batch_onehot) * deepkinet_exp.model.dt
+        each_gamma = deepkinet_exp.model.dec_g(zl, batch_onehot) * deepkinet_exp.model.dt
+        diff_px_zd_ld = deepkinet_exp.model.calculate_diff_x_grad_onehot(zl, batch_onehot, dl)
+        adata.layers['DeepKINET_velocity'] = deepkinet_exp.model.calculate_diff_x_grad_onehot(zl, batch_onehot, dl).cpu().detach().numpy()
+        
+    adata.obs['DeepKINET_velocity'] = np.mean(np.abs(adata.layers['DeepKINET_velocity']), axis=1)
+
     adata.layers['splicing_rate'] = each_beta.cpu().detach().numpy()
     adata.layers['degradation_rate'] = each_gamma.cpu().detach().numpy()
 
-    dl = qd.loc
     adata.obsm['latent_variable'] = zl.cpu().detach().numpy()
     adata.obsm['latent_variable_sample'] = z.cpu().detach().numpy()
     adata.obsm['latent_velocity'] = dl.cpu().detach().numpy()
     adata.obsm['latent_velocity_sample'] = d.cpu().detach().numpy()
-
-    diff_px_zd_ld = deepkinet_exp.model.calculate_diff_x_grad(zl, dl)
 
     raw_u_ld = (diff_px_zd_ld + s_hat * each_gamma) / each_beta
     pu_zd_ld = raw_u_ld + deepkinet_exp.model.relu(- raw_u_ld).detach()
@@ -107,9 +120,6 @@ def post_process(adata, deepkinet_exp):
 
     print('test_s_correlation', test_s_correlation)
     print('test_u_correlation', test_u_correlation)
-
-    adata.layers['DeepKINET_velocity'] = deepkinet_exp.model.calculate_diff_x_grad(zl, dl).cpu().detach().numpy()
-    adata.obs['DeepKINET_velocity'] = np.mean(np.abs(adata.layers['DeepKINET_velocity']), axis=1)
 
     results_dict = {
         'train_s_correlation':train_s_correlation, 'train_u_correlation':train_u_correlation,
