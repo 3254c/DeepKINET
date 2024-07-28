@@ -7,7 +7,6 @@ figures
 build/
 dist/
 src/DeepKINET.egg-info/
-#Wあなたのパッケージ名.egg-info/
 .pypirc
 tutorial/tutolial.py
 __pycache__/
