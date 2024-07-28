@@ -255,7 +255,7 @@ def rank_genes_groups_degradation(adata, groupby, groups, reference, method = 't
 
 def visualization_kinetics(adata, gene, save_path=None):
   fig, axes = plt.subplots(1, 3, figsize=(5 * 3, 5 * 1))
-  sc.pl.umap(adata, color=gene, layer = 's_hat', show=False, ax=axes[0], colorbar_loc = None, frameon = False)
+  sc.pl.umap(adata, color=gene, layer = 's_hat', show=False, ax=axes[0], color_map = 'viridis', colorbar_loc = None, frameon = False)
   axes[0].set_title(f'{gene} exspression')
   sc.pl.umap(adata, color=gene, layer = 'splicing_rate', show=False, ax=axes[1], color_map = 'Blues', colorbar_loc = None, frameon = False)
   axes[1].set_title(f'{gene} splicing rates')

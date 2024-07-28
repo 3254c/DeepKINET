@@ -50,7 +50,7 @@ class Encoder(nn.Module):
 class Encoder_of_s_u(nn.Module):
     def __init__(self, num_h_layers, x_dim, h_dim, z_dim):
         super(Encoder_of_s_u, self).__init__()
-        self.x2h = LinearGELU(x_dim*2, h_dim)
+        self.x2h = LinearGELU(x_dim, h_dim)
         self.seq_nn = SeqNN_LinearGELU(num_h_layers - 1, h_dim)
         self.h2mu = nn.Linear(h_dim, z_dim)
         self.h2logvar = nn.Linear(h_dim, z_dim)
@@ -103,14 +103,14 @@ class DeepKINET(nn.Module):
         self.batch_onehot = batch_onehot
         if self.batch_key is None:
             print('batch_key is None')
-            self.enc_z = Encoder_of_s_u(enc_z_layers, x_dim, h_dim, z_dim)
+            self.enc_z = Encoder_of_s_u(enc_z_layers, x_dim*2, h_dim, z_dim)
             self.enc_d = Encoder(z_dim, h_dim, z_dim)
             self.dec_z = Decoder(z_dim, h_dim, x_dim)
             self.dec_b = Decoder(z_dim, h_dim, x_dim)
             self.dec_g = Decoder(z_dim, h_dim, x_dim)
         else:
             print('batch_key is not None')
-            self.enc_z = Encoder_of_s_u(enc_z_layers, x_dim * 2 + batch_onehot.shape[1], h_dim, z_dim)
+            self.enc_z = Encoder_of_s_u(enc_z_layers, x_dim*2 + batch_onehot.shape[1], h_dim, z_dim)
             self.enc_d = Encoder(z_dim, h_dim, z_dim)
             self.dec_z = Decoder_onehot(z_dim + batch_onehot.shape[1], h_dim, x_dim)
             self.dec_b = Decoder_onehot(z_dim + batch_onehot.shape[1], h_dim, x_dim)

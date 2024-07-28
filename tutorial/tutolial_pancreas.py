@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append('src/deepkinet')
 import workflow
-import utils
+import utils as utils
 import scanpy as sc
 import scvelo as scv
 
